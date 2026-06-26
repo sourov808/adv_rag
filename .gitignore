@@ -1,0 +1,24 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets — never commit API keys
+.env
+.env.*
+
+# Qdrant local storage (if ever used)
+qdrant_store/
+
+# Notebook experiment backups
+*.bak.ipynb
+
+# Source documents: keep the folder, not third-party files (copyright)
+document/*
+!document/.gitkeep
