@@ -40,6 +40,6 @@ def generate_answer(client: Groq, query: str, passages: list[dict], model_name: 
             {'role': 'system', 'content': SYSTEM_PROMPT},
             {'role': 'user', 'content': user_prompt},
         ],
-        temperature=0.2,  # low temperature keeps the answer factual
+        temperature=0.2, 
     )
     return response.choices[0].message.content
