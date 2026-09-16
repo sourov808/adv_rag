@@ -3,10 +3,6 @@
 A document question-answering application built with OpenAI, Qdrant, and Ragas.
 Upload a PDF, text, or Markdown document, then ask grounded questions about its content.
 
-![Ragas evaluation results](assets/evaluation-results.png)
-
-🎥 [Watch the project demo video](assets/rag-demo.mp4)
-
 ## Features
 
 - Upload PDF, TXT, and Markdown files.
