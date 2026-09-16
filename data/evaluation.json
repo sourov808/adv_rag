@@ -1,0 +1,107 @@
+[
+  {
+    "id": "oz-01",
+    "question": "Who did Dorothy live with in Kansas?",
+    "reference": "Dorothy lived with her Uncle Henry and Aunt Em in Kansas.",
+    "expected_chapter": "Chapter I. The Cyclone",
+    "should_answer": true
+  },
+  {
+    "id": "oz-02",
+    "question": "How did Dorothy's house arrive in the Land of Oz, and who did it kill?",
+    "reference": "A cyclone carried Dorothy's house to the Land of Oz, where it landed on and killed the Wicked Witch of the East.",
+    "expected_chapter": "Chapter II. The Council with the Munchkins",
+    "should_answer": true
+  },
+  {
+    "id": "oz-03",
+    "question": "What road was Dorothy told to follow to reach the Emerald City?",
+    "reference": "Dorothy was told to follow the road paved with yellow brick.",
+    "expected_chapter": "Chapter II. The Council with the Munchkins",
+    "should_answer": true
+  },
+  {
+    "id": "oz-04",
+    "question": "What did the Scarecrow hope the Wizard of Oz would give him?",
+    "reference": "The Scarecrow hoped the Wizard would give him brains.",
+    "expected_chapter": "Chapter III. How Dorothy Saved the Scarecrow",
+    "should_answer": true
+  },
+  {
+    "id": "oz-05",
+    "question": "Why did the Tin Woodman want a heart?",
+    "reference": "The Tin Woodman wanted a heart because he believed a heart would allow him to love and make him happy.",
+    "expected_chapter": "Chapter V. The Rescue of the Tin Woodman",
+    "should_answer": true
+  },
+  {
+    "id": "oz-06",
+    "question": "What did the Cowardly Lion ask the Wizard to give him?",
+    "reference": "The Cowardly Lion asked the Wizard to give him courage.",
+    "expected_chapter": "Chapter VI. The Cowardly Lion",
+    "should_answer": true
+  },
+  {
+    "id": "oz-07",
+    "question": "How was the Cowardly Lion rescued from the deadly poppy field?",
+    "reference": "Thousands of field mice pulled the sleeping Lion out of the poppy field on a wooden truck made by the Tin Woodman.",
+    "expected_chapter": "Chapter IX. The Queen of the Field Mice",
+    "should_answer": true
+  },
+  {
+    "id": "oz-08",
+    "question": "How did Dorothy defeat the Wicked Witch of the West?",
+    "reference": "Dorothy threw a bucket of water over the Wicked Witch of the West, causing the Witch to melt away.",
+    "expected_chapter": "Chapter XII. The Search for the Wicked Witch",
+    "should_answer": true
+  },
+  {
+    "id": "oz-09",
+    "question": "What power did the Golden Cap give its owner?",
+    "reference": "The Golden Cap allowed its owner to command the Winged Monkeys three times.",
+    "expected_chapter": "Chapter XIV. The Winged Monkeys",
+    "should_answer": true
+  },
+  {
+    "id": "oz-10",
+    "question": "Who was the Wizard of Oz before he came to the Land of Oz?",
+    "reference": "He was a man born in Omaha who worked as a ventriloquist and balloonist before a balloon carried him to the Land of Oz.",
+    "expected_chapter": "Chapter XV. The Discovery of Oz, the Terrible",
+    "should_answer": true
+  },
+  {
+    "id": "oz-11",
+    "question": "What did Oz put inside the Scarecrow's head as brains?",
+    "reference": "Oz filled the Scarecrow's head with bran mixed with pins and needles and called them bran-new brains.",
+    "expected_chapter": "Chapter XVI. The Magic Art of the Great Humbug",
+    "should_answer": true
+  },
+  {
+    "id": "oz-12",
+    "question": "How did Dorothy finally use the Silver Shoes to return home?",
+    "reference": "Dorothy knocked the heels of the Silver Shoes together three times and commanded them to take her home to Aunt Em.",
+    "expected_chapter": "Chapter XXIII. Glinda The Good Witch Grants Dorothy's Wish",
+    "should_answer": true
+  },
+  {
+    "id": "oz-13",
+    "question": "What did Dorothy, the Scarecrow, the Tin Woodman, and the Lion each want from Oz?",
+    "reference": "Dorothy wanted to return to Kansas, the Scarecrow wanted brains, the Tin Woodman wanted a heart, and the Lion wanted courage.",
+    "expected_chapter": "Multiple chapters",
+    "should_answer": true
+  },
+  {
+    "id": "oz-14",
+    "question": "What was Dorothy's middle name?",
+    "reference": "The book does not state Dorothy's middle name.",
+    "expected_chapter": null,
+    "should_answer": false
+  },
+  {
+    "id": "oz-15",
+    "question": "What was the name of Dorothy's school teacher in Kansas?",
+    "reference": "The book does not name or describe a school teacher for Dorothy.",
+    "expected_chapter": null,
+    "should_answer": false
+  }
+]

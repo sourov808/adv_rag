@@ -1,0 +1,116 @@
+"""Load supported files and split their text into overlapping chunks."""
+
+import re
+from collections import defaultdict
+from hashlib import sha256
+from io import BytesIO
+from pathlib import Path
+
+from pypdf import PdfReader
+
+from rag.models import Chunk, Document
+
+
+SUPPORTED_EXTENSIONS = frozenset({".pdf", ".txt", ".md"})
+
+
+def load_upload(name: str, content: bytes) -> list[Document]:
+    """Extract page-level documents from one uploaded file."""
+    source = Path(name).name
+    extension = Path(source).suffix.lower()
+
+    if not source or not content:
+        raise ValueError("The uploaded file is empty.")
+    if extension not in SUPPORTED_EXTENSIONS:
+        supported = ", ".join(sorted(SUPPORTED_EXTENSIONS))
+        raise ValueError(f"Unsupported file type '{extension or 'unknown'}'. Use {supported}.")
+
+    if extension == ".pdf":
+        documents = _load_pdf(source, content)
+    else:
+        try:
+            text = content.decode("utf-8").strip()
+        except UnicodeDecodeError as exc:
+            raise ValueError(f"{source} is not valid UTF-8 text.") from exc
+        documents = [Document(text=text, source=source, page=1)] if text else []
+
+    if not documents:
+        raise ValueError(f"No readable text was found in {source}.")
+    return documents
+
+
+def load_uploads(files: list[tuple[str, bytes]]) -> list[Document]:
+    """Load several ``(filename, content)`` uploads into one document list."""
+    if not files:
+        raise ValueError("Choose at least one document to index.")
+
+    documents: list[Document] = []
+    for name, content in files:
+        documents.extend(load_upload(name, content))
+    return documents
+
+
+def _load_pdf(source: str, content: bytes) -> list[Document]:
+    try:
+        reader = PdfReader(BytesIO(content))
+    except Exception as exc:
+        raise ValueError(f"Could not read PDF file {source}.") from exc
+
+    documents: list[Document] = []
+    for page_number, page in enumerate(reader.pages, start=1):
+        try:
+            text = (page.extract_text() or "").strip()
+        except Exception as exc:
+            raise ValueError(f"Could not extract page {page_number} from {source}.") from exc
+        if text:
+            documents.append(Document(text=text, source=source, page=page_number))
+    return documents
+
+
+def chunk_documents(
+    documents: list[Document],
+    chunk_size: int,
+    overlap: int,
+) -> list[Chunk]:
+    """Split documents into deterministic word windows with shared context."""
+    if chunk_size <= 0:
+        raise ValueError("chunk_size must be greater than zero.")
+    if overlap < 0 or overlap >= chunk_size:
+        raise ValueError("overlap must be at least zero and smaller than chunk_size.")
+
+    document_ids = _create_document_ids(documents)
+    chunks: list[Chunk] = []
+    step = chunk_size - overlap
+
+    for document in documents:
+        words = re.findall(r"\S+", document.text)
+        document_id = document_ids[document.source]
+
+        for position, start in enumerate(range(0, len(words), step)):
+            text = " ".join(words[start : start + chunk_size])
+            raw_id = f"{document_id}:{document.page}:{position}:{text}"
+            chunks.append(
+                Chunk(
+                    id=sha256(raw_id.encode()).hexdigest()[:16],
+                    document_id=document_id,
+                    text=text,
+                    source=document.source,
+                    page=document.page,
+                    position=position,
+                )
+            )
+            if start + chunk_size >= len(words):
+                break
+
+    return chunks
+
+
+def _create_document_ids(documents: list[Document]) -> dict[str, str]:
+    pages_by_source: dict[str, list[str]] = defaultdict(list)
+    for document in documents:
+        pages_by_source[document.source].append(f"{document.page}:{document.text}")
+
+    return {
+        source: sha256(f"{source}:{'|'.join(pages)}".encode()).hexdigest()[:16]
+        for source, pages in pages_by_source.items()
+    }

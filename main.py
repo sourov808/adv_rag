@@ -1,105 +1,153 @@
-# Entry point. Calls each module's functions in order, like the notebook walks through them.
-# Usage:
-#   uv run main.py                       interactive: ask questions in a loop
-#   uv run main.py "your question here"  answer one question and exit
+"""Streamlit interface for the RAG application."""
 
-import os
-import logging
+import json
+from pathlib import Path
 
-# Quiet the chatty libraries BEFORE they are imported below, so the terminal stays readable.
-os.environ.setdefault('HF_HUB_DISABLE_PROGRESS_BARS', '1')   # no model-download bars
-os.environ.setdefault('TOKENIZERS_PARALLELISM', 'false')
-logging.basicConfig(level=logging.WARNING)
-for _noisy in ('httpx', 'httpcore', 'sentence_transformers', 'transformers',
-               'huggingface_hub', 'urllib3', 'pypdf', 'qdrant_client'):
-    logging.getLogger(_noisy).setLevel(logging.ERROR)
-try:
-    from transformers.utils import logging as _hf_logging
-    _hf_logging.disable_progress_bar()
-    _hf_logging.set_verbosity_error()
-except Exception:
-    pass
+import streamlit as st
 
-import sys
-from dotenv import load_dotenv
+from rag.embeddings import embed_chunks, get_embedding_client
+from rag.generation import create_openai_model, generate_answer
+from rag.ingestion import chunk_documents, load_uploads
+from rag.retrieval import build_context, get_source_labels, retrieve_chunks
+from rag.vector_store import collection_count, open_collection, save_chunks
 
-import config
-from loader import load_directory
-from splitter import split_records
-from embedder import load_embedding_model, embed_chunks, embed_query
-from vector_store import connect_qdrant, create_collection, upsert_chunks, dense_search
-from keyword_index import build_bm25, bm25_search
-from hybrid import reciprocal_rank_fusion
-from reranker import load_reranker, rerank
-from generator import connect_groq, generate_answer
-
-
-def build_index():
-    # One-time setup: load, split, embed, store, and load the models.
-    print('Preparing... (this can take a moment on first run)')
-
-    records = load_directory(config.DOCS_DIR, config.SUPPORTED_EXTENSIONS)
-    if not records:
-        raise RuntimeError(f'No documents found in {config.DOCS_DIR}. Add a PDF/TXT/MD file and retry.')
-    chunks = split_records(records, chunk_size=config.CHUNK_SIZE, chunk_overlap=config.CHUNK_OVERLAP)
-
-    embed_model = load_embedding_model()
-    embed_chunks(embed_model, chunks)
-
-    qdrant = connect_qdrant()
-    create_collection(qdrant, embed_model.get_embedding_dimension())
-    upsert_chunks(qdrant, chunks)
-
-    bm25 = build_bm25(chunks)
-    reranker = load_reranker()
-    groq = connect_groq()
-
-    print('Ready.')
-    return embed_model, qdrant, bm25, chunks, reranker, groq
-
-
-def answer_question(query, embed_model, qdrant, bm25, chunks, reranker, groq):
-    # Retrieve two ways, fuse, rerank, then generate a grounded answer.
-    query_vector = embed_query(embed_model, query)
-    dense_hits = dense_search(qdrant, query_vector, config.RETRIEVE_POOL)
-    keyword_hits = bm25_search(bm25, chunks, query, config.RETRIEVE_POOL)
-    fused = reciprocal_rank_fusion(dense_hits, keyword_hits, config.RETRIEVE_POOL)
-    passages = rerank(reranker, query, fused, config.FINAL_TOP_K)
-    answer = generate_answer(groq, query, passages)
-    return answer, passages
-
-
-def print_answer(answer, passages):
-    print('\n=== ANSWER ===')
-    print(answer)
-    print('\n=== SOURCES ===')
-    for i, p in enumerate(passages, 1):
-        print(f"  [{i}] page {p['page']} | chunk {p['chunk_id']} | rerank={p.get('rerank_score', 0):.3f}")
+results_file = Path("data/evaluation_results.json")
 
 
 def main():
-    load_dotenv()  # load keys before connecting to Qdrant and Groq
-    pieces = build_index()
+    """Show the document upload and question-answer interface."""
+    st.set_page_config(page_title="RAG", page_icon="📚")
+    st.title("RAG")
+    st.write("Upload documents, index them, and ask questions about their content.")
 
-    if len(sys.argv) > 1:
-        answer, passages = answer_question(' '.join(sys.argv[1:]), *pieces)
-        print_answer(answer, passages)
+    embedding_client = get_embedding_client()
+    collection = open_collection()
+
+    st.subheader("1. Add documents")
+    uploaded_files = st.file_uploader(
+        "Choose PDF, text, or Markdown files",
+        type=["pdf", "txt", "md"],
+        accept_multiple_files=True,
+    )
+
+    if st.button("Index documents", type="primary"):
+        index_documents(uploaded_files, embedding_client, collection)
+
+    st.divider()
+    st.subheader("2. Ask a question")
+
+    with st.form("question_form"):
+        question = st.text_input("Question")
+        submitted = st.form_submit_button("Get answer")
+
+    if submitted:
+        answer_question(question, embedding_client, collection)
+
+    st.divider()
+    show_evaluation_results()
+
+
+def index_documents(uploaded_files, embedding_client, collection):
+    """Read uploaded files and save their chunks in ChromaDB."""
+    if not uploaded_files:
+        st.warning("Choose at least one document first.")
         return
 
-    print('\nAsk a question about the document (type "exit" to quit).')
-    while True:
-        try:
-            question = input('\n> ').strip()
-        except (EOFError, KeyboardInterrupt):
-            print()
-            break
-        if not question:
-            continue
-        if question.lower() in {'exit', 'quit'}:
-            break
-        answer, passages = answer_question(question, *pieces)
-        print_answer(answer, passages)
+    files = []
+    for uploaded_file in uploaded_files:
+        files.append((uploaded_file.name, uploaded_file.getvalue()))
+
+    try:
+        with st.spinner("Reading and indexing documents..."):
+            documents = load_uploads(files)
+            chunks = chunk_documents(documents)
+            embeddings = embed_chunks(embedding_client, chunks)
+            save_chunks(collection, chunks, embeddings)
+
+        st.success(f"Indexed {len(chunks)} chunks from {len(files)} files.")
+    except Exception as error:
+        st.error(str(error))
 
 
-if __name__ == '__main__':
+def answer_question(question, embedding_client, collection):
+    """Retrieve context, generate an answer, and show its sources."""
+    if not question or not question.strip():
+        st.warning("Enter a question first.")
+        return
+
+    if collection_count(collection) == 0:
+        st.warning("Index at least one document before asking a question.")
+        return
+
+    try:
+        with st.spinner("Searching the documents..."):
+            matches = retrieve_chunks(question, embedding_client, collection)
+            context = build_context(matches)
+            llm = create_openai_model()
+            answer, usage = generate_answer(
+                llm,
+                question,
+                context,
+            )
+
+        st.subheader("Answer")
+        st.write(answer)
+        st.caption(
+            f"Input: {usage['prompt_tokens']} tokens | "
+            f"Output: {usage['completion_tokens']} tokens | "
+            f"Total: {usage['total_tokens']} tokens"
+        )
+
+        source_labels = get_source_labels(matches)
+        if source_labels:
+            st.subheader("Sources")
+            for source in source_labels:
+                st.write(f"- {source}")
+    except Exception as error:
+        st.error(str(error))
+
+
+def show_evaluation_results():
+    """Display completed evaluation results without running another evaluation."""
+    st.subheader("3. Evaluation results")
+
+    if not results_file.exists():
+        st.info("Run the offline evaluation to see results here.")
+        return
+
+    with results_file.open(encoding="utf-8") as file:
+        report = json.load(file)
+
+    averages = report["averages"]
+    metrics = st.columns(4)
+    metric_names = [
+        "faithfulness",
+        "answer_relevancy",
+        "context_precision",
+        "context_recall",
+    ]
+
+    for column, name in zip(metrics, metric_names, strict=True):
+        score = averages[name]
+        label = name.replace("_", " ").title()
+        column.metric(label, f"{score:.3f}" if score is not None else "N/A")
+
+    rows = []
+    for result in report["results"]:
+        rows.append(
+            {
+                "ID": result["id"],
+                "Question": result["question"],
+                "Faithfulness": result["scores"]["faithfulness"],
+                "Answer relevancy": result["scores"]["answer_relevancy"],
+                "Context precision": result["scores"]["context_precision"],
+                "Context recall": result["scores"]["context_recall"],
+            }
+        )
+
+    st.dataframe(rows, hide_index=True, use_container_width=True)
+    st.caption("Context precision and recall are not scored for unanswerable questions.")
+
+
+if __name__ == "__main__":
     main()

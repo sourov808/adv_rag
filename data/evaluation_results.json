@@ -1,0 +1,360 @@
+{
+  "averages": {
+    "faithfulness": 0.8777777777777778,
+    "answer_relevancy": 0.6428056357871125,
+    "context_precision": 0.8076923076346154,
+    "context_recall": 0.7692307692307693
+  },
+  "answer_token_usage": {
+    "prompt_tokens": 13710,
+    "completion_tokens": 493,
+    "total_tokens": 14203
+  },
+  "results": [
+    {
+      "id": "oz-01",
+      "question": "Who did Dorothy live with in Kansas?",
+      "reference": "Dorothy lived with her Uncle Henry and Aunt Em in Kansas.",
+      "should_answer": true,
+      "answer": "Dorothy lived with Aunt Em in Kansas. (Source 1)",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 0.0,
+        "answer_relevancy": 0.8021674464896762,
+        "context_precision": 0.9999999999,
+        "context_recall": 0.0
+      },
+      "usage": {
+        "prompt_tokens": 920,
+        "completion_tokens": 14,
+        "total_tokens": 934
+      }
+    },
+    {
+      "id": "oz-02",
+      "question": "How did Dorothy's house arrive in the Land of Oz, and who did it kill?",
+      "reference": "A cyclone carried Dorothy's house to the Land of Oz, where it landed on and killed the Wicked Witch of the East.",
+      "should_answer": true,
+      "answer": "Dorothy's house arrived in the Land of Oz by being carried by a cyclone. It killed the Wicked Witch of the East when it fell on her, as indicated by the little old woman who pointed out the witch's feet sticking out from under the house (Source 1).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.850566088328098,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 905,
+        "completion_tokens": 56,
+        "total_tokens": 961
+      }
+    },
+    {
+      "id": "oz-03",
+      "question": "What road was Dorothy told to follow to reach the Emerald City?",
+      "reference": "Dorothy was told to follow the road paved with yellow brick.",
+      "should_answer": true,
+      "answer": "Dorothy was told to follow the road of yellow brick to reach the Emerald City (Source 2).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 0.5,
+        "answer_relevancy": 0.8645740330419324,
+        "context_precision": 0.49999999995,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 925,
+        "completion_tokens": 21,
+        "total_tokens": 946
+      }
+    },
+    {
+      "id": "oz-04",
+      "question": "What did the Scarecrow hope the Wizard of Oz would give him?",
+      "reference": "The Scarecrow hoped the Wizard would give him brains.",
+      "should_answer": true,
+      "answer": "The Scarecrow hoped the Wizard of Oz would give him brains so that he could become as much a man as any other in the Land of Oz (Source 2).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.9451539279660353,
+        "context_precision": 0.9999999999666667,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 939,
+        "completion_tokens": 35,
+        "total_tokens": 974
+      }
+    },
+    {
+      "id": "oz-05",
+      "question": "Why did the Tin Woodman want a heart?",
+      "reference": "The Tin Woodman wanted a heart because he believed a heart would allow him to love and make him happy.",
+      "should_answer": true,
+      "answer": "The Tin Woodman wanted a heart because he believed that having a heart would allow him to love and be happy, as he expressed that the greatest loss he had known was the loss of his heart. He wanted to be as other men are and to marry the Munchkin maiden he loved (Source 1).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 1.0,
+        "context_precision": 0.99999999995,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 935,
+        "completion_tokens": 63,
+        "total_tokens": 998
+      }
+    },
+    {
+      "id": "oz-06",
+      "question": "What did the Cowardly Lion ask the Wizard to give him?",
+      "reference": "The Cowardly Lion asked the Wizard to give him courage.",
+      "should_answer": true,
+      "answer": "The Cowardly Lion asked the Wizard to give him courage so that he could become the King of Beasts, as men call him (Source 1).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 0.6666666666666666,
+        "answer_relevancy": 0.9694224470078353,
+        "context_precision": 0.9999999999666667,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 929,
+        "completion_tokens": 32,
+        "total_tokens": 961
+      }
+    },
+    {
+      "id": "oz-07",
+      "question": "How was the Cowardly Lion rescued from the deadly poppy field?",
+      "reference": "Thousands of field mice pulled the sleeping Lion out of the poppy field on a wooden truck made by the Tin Woodman.",
+      "should_answer": true,
+      "answer": "The Cowardly Lion was rescued from the deadly poppy field by a group of field mice. They worked hard to lift him onto a truck, and with the help of the Woodman and the Scarecrow pushing from behind, they managed to roll the Lion out of the poppy bed to the green fields where he could breathe fresh air again (Source 2).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8995679841400598,
+        "context_precision": 0.99999999995,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 903,
+        "completion_tokens": 75,
+        "total_tokens": 978
+      }
+    },
+    {
+      "id": "oz-08",
+      "question": "How did Dorothy defeat the Wicked Witch of the West?",
+      "reference": "Dorothy threw a bucket of water over the Wicked Witch of the West, causing the Witch to melt away.",
+      "should_answer": true,
+      "answer": "Dorothy defeated the Wicked Witch of the West by throwing a bucket of water on her, which caused the Witch to melt away into a shapeless mass. After confirming that the Witch had melted completely, Dorothy cleaned up the mess and informed the Cowardly Lion that they were no longer prisoners in a strange land (Source 1).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 1.0000000000000002,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 861,
+        "completion_tokens": 67,
+        "total_tokens": 928
+      }
+    },
+    {
+      "id": "oz-09",
+      "question": "What power did the Golden Cap give its owner?",
+      "reference": "The Golden Cap allowed its owner to command the Winged Monkeys three times.",
+      "should_answer": true,
+      "answer": "The Golden Cap allowed its owner to call upon the Winged Monkeys three times, who would obey any order given to them. However, no person could command the Winged Monkeys more than three times (Source 1).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.5178388056254879,
+        "context_precision": 0.9999999999666667,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 904,
+        "completion_tokens": 46,
+        "total_tokens": 950
+      }
+    },
+    {
+      "id": "oz-10",
+      "question": "Who was the Wizard of Oz before he came to the Land of Oz?",
+      "reference": "He was a man born in Omaha who worked as a ventriloquist and balloonist before a balloon carried him to the Land of Oz.",
+      "should_answer": true,
+      "answer": "I do not know.",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.0,
+        "context_recall": 0.0
+      },
+      "usage": {
+        "prompt_tokens": 957,
+        "completion_tokens": 5,
+        "total_tokens": 962
+      }
+    },
+    {
+      "id": "oz-11",
+      "question": "What did Oz put inside the Scarecrow's head as brains?",
+      "reference": "Oz filled the Scarecrow's head with bran mixed with pins and needles and called them bran-new brains.",
+      "should_answer": true,
+      "answer": "Oz put a mixture of bran, pins, and needles inside the Scarecrow's head as brains (Source 1).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 1.0000000000000002,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 939,
+        "completion_tokens": 25,
+        "total_tokens": 964
+      }
+    },
+    {
+      "id": "oz-12",
+      "question": "How did Dorothy finally use the Silver Shoes to return home?",
+      "reference": "Dorothy knocked the heels of the Silver Shoes together three times and commanded them to take her home to Aunt Em.",
+      "should_answer": true,
+      "answer": "I do not know.",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.0,
+        "context_recall": 0.0
+      },
+      "usage": {
+        "prompt_tokens": 866,
+        "completion_tokens": 5,
+        "total_tokens": 871
+      }
+    },
+    {
+      "id": "oz-13",
+      "question": "What did Dorothy, the Scarecrow, the Tin Woodman, and the Lion each want from Oz?",
+      "reference": "Dorothy wanted to return to Kansas, the Scarecrow wanted brains, the Tin Woodman wanted a heart, and the Lion wanted courage.",
+      "should_answer": true,
+      "answer": "Dorothy wanted Oz to send her back to Kansas. The Scarecrow wanted brains, the Tin Woodman wanted a heart, and the Cowardly Lion wanted courage (Source 1).",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.7927938042075623,
+        "context_precision": 0.9999999999,
+        "context_recall": 1.0
+      },
+      "usage": {
+        "prompt_tokens": 931,
+        "completion_tokens": 39,
+        "total_tokens": 970
+      }
+    },
+    {
+      "id": "oz-14",
+      "question": "What was Dorothy's middle name?",
+      "reference": "The book does not state Dorothy's middle name.",
+      "should_answer": false,
+      "answer": "I do not know.",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.0,
+        "context_precision": null,
+        "context_recall": null
+      },
+      "usage": {
+        "prompt_tokens": 878,
+        "completion_tokens": 5,
+        "total_tokens": 883
+      }
+    },
+    {
+      "id": "oz-15",
+      "question": "What was the name of Dorothy's school teacher in Kansas?",
+      "reference": "The book does not name or describe a school teacher for Dorothy.",
+      "should_answer": false,
+      "answer": "I do not know.",
+      "sources": [
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1",
+        "wizard_of_oz.txt, page 1"
+      ],
+      "scores": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.0,
+        "context_precision": null,
+        "context_recall": null
+      },
+      "usage": {
+        "prompt_tokens": 918,
+        "completion_tokens": 5,
+        "total_tokens": 923
+      }
+    }
+  ]
+}

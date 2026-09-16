@@ -1,113 +1,124 @@
-# Advanced RAG
+# RAG
 
-A retrieval-augmented generation pipeline that answers questions about your own documents
-and cites the pages it used. It combines semantic (vector) search with keyword (BM25)
-search, reranks the results with a cross-encoder, and generates a grounded answer with an
-LLM. If the answer is not in the document, it says so instead of making something up.
+A document question-answering application built with OpenAI, Qdrant, and Ragas.
+Upload a PDF, text, or Markdown document, then ask grounded questions about its content.
 
-I built this to understand how a real RAG system fits together, beyond the basic
-"embed and search" version. Each stage is its own small module of plain functions, and the
-notebook walks through them one at a time.
+![Ragas evaluation results](assets/evaluation-results.png)
+
+🎥 [Watch the project demo video](assets/rag-demo.mp4)
+
+## Features
+
+- Upload PDF, TXT, and Markdown files.
+- Split documents into overlapping chunks.
+- Create embeddings with OpenAI `text-embedding-3-small`.
+- Store and retrieve vectors with local Qdrant.
+- Generate grounded answers with OpenAI Agents SDK and `gpt-4o-mini`.
+- Show source pages and token usage in Streamlit.
+- Evaluate retrieval and answer quality with Ragas.
 
 ## How it works
 
+```text
+Document upload
+  → text extraction
+  → chunking
+  → OpenAI embeddings
+  → Qdrant vector storage
+
+Question
+  → OpenAI embedding
+  → Qdrant retrieval
+  → OpenAI Agents SDK
+  → grounded answer with sources
 ```
-document  ->  load  ->  split  ->  embed  ->  store in Qdrant
-                                                    |
-question  ->  embed  ->  +-- dense search (meaning) --+
-                         |                            |--> RRF fuse --> rerank --> LLM --> answer
-                         +-- BM25 search (keywords) --+
-```
 
-1. **Load** (`loader.py`) reads PDF/TXT/MD files into page records.
-2. **Split** (`splitter.py`) cuts pages into overlapping chunks.
-3. **Embed** (`embedder.py`) turns chunks into 384-dim vectors with `all-MiniLM-L6-v2`.
-4. **Store** (`vector_store.py`) uploads vectors to Qdrant Cloud.
-5. **Dense search** finds chunks by meaning; **BM25** (`keyword_index.py`) finds them by
-   exact words. The two cover each other's blind spots.
-6. **Hybrid** (`hybrid.py`) fuses both rankings with Reciprocal Rank Fusion.
-7. **Rerank** (`reranker.py`) re-scores the candidates with a cross-encoder so the most
-   relevant passage ends up first.
-8. **Generate** (`generator.py`) asks a Groq-hosted LLM to answer using only those
-   passages, with page citations.
+## Tech stack
 
-`main.py` calls these functions in order, the same sequence the notebook walks through.
+- Python
+- Streamlit
+- OpenAI API
+- OpenAI Agents SDK
+- `gpt-4o-mini`
+- `text-embedding-3-small`
+- Qdrant
+- Ragas
+- PyPDF
+- Pydantic
 
-## Stack
+## Evaluation
 
-- Python 3.14, managed with [uv](https://docs.astral.sh/uv/)
-- [sentence-transformers](https://www.sbert.net/) for embeddings and reranking
-- [Qdrant Cloud](https://qdrant.tech/) as the vector database
-- [rank-bm25](https://github.com/dorianbrown/rank_bm25) for keyword search
-- [Groq](https://groq.com/) for fast LLM inference (`llama-3.3-70b-versatile`)
-- LangChain text splitters, pypdf
+The project was evaluated with 15 questions from *The Wonderful Wizard of Oz*, including
+two unanswerable questions to check hallucination behavior.
+
+| Metric | Score | What it measures |
+| --- | ---: | --- |
+| Faithfulness | 0.878 | Whether the answer is supported by retrieved context. |
+| Answer relevancy | 0.643 | Whether the answer directly addresses the question. |
+| Context precision | 0.808 | Whether relevant chunks are ranked near the top. |
+| Context recall | 0.769 | Whether retrieval finds enough information for the answer. |
+
+These results show strong groundedness and retrieval precision. The next focus is improving
+context recall and making answers more direct.
 
 ## Setup
 
-You need a (free) Qdrant Cloud account and a (free) Groq API key.
-
-1. Install dependencies:
-
-   ```bash
-   uv sync
-   ```
-
-2. Create a `.env` file in the project root (it is gitignored, never commit it):
-
-   ```
-   QDRANT_ENDPOINT=https://your-cluster-url.qdrant.io:6333
-   QDRANT_API_KEY=your-qdrant-key
-   GROQ_API_KEY=your-groq-key
-   ```
-
-3. Put a document to query inside the `document/` folder. Any PDF, `.txt`, or `.md` works.
-
-## Usage
-
-Ask a single question:
+Requires Python 3.12 and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-uv run main.py "How do I set up an Express server with npm?"
+uv sync
 ```
 
-Or run interactively and ask several:
+Create a `.env` file in the project root:
+
+```env
+OPENAI_API_KEY=your_key_here
+OPENAI_MODEL=gpt-4o-mini
+OPENAI_EVALUATION_MODEL=gpt-4o-mini
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+```
+
+## Run the app
 
 ```bash
-uv run main.py
+uv run streamlit run main.py
 ```
 
-Each answer prints the passages it was grounded on, with page and chunk numbers, so you can
-check it against the source.
+Upload `data/wizard_of_oz.txt`, click **Index documents**, then ask a question.
 
-## The notebook
+Example questions:
 
-`data.ipynb` is a guided walkthrough of the same pipeline, stage by stage, with the output
-of each step shown. It imports the real module functions rather than re-implementing
-anything, so it stays in sync with the code. Open it if you want to understand how the
-pieces behave individually before they are wired together in `main.py`.
+```text
+Who did Dorothy live with in Kansas?
 
-## Project layout
+How did Dorothy defeat the Wicked Witch of the West?
 
-```
-config.py          all settings (paths, model names, search parameters)
-loader.py          documents -> page records
-splitter.py        pages -> chunks
-embedder.py        chunks/queries -> vectors
-vector_store.py    Qdrant: connect, collection, upload, dense search
-keyword_index.py   BM25 keyword index
-hybrid.py          Reciprocal Rank Fusion
-reranker.py        cross-encoder reranking
-generator.py       grounded answer generation (Groq)
-main.py            entry point, calls the above in order
-data.ipynb         stage-by-stage walkthrough
+What did Dorothy, the Scarecrow, the Tin Woodman, and the Lion each want from Oz?
 ```
 
-## Notes and limitations
+## Run evaluation
 
-- `create_collection` recreates the collection on every run, which is fine for a demo but
-  would overwrite data in production. A real ingest would check for an existing collection
-  first.
-- The BM25 index is held in memory and rebuilt on each run, so it does not persist between
-  processes. For a larger corpus this would move into Qdrant's own sparse vectors.
-- Chunking is fixed-size character splitting. Smarter, structure-aware chunking would
-  improve retrieval on documents with headings, tables, or code.
+After indexing the document, stop Streamlit and run:
+
+```bash
+uv run python -m rag.evaluation
+```
+
+The evaluation saves:
+
+- `data/evaluation_results.json` — full per-question scores and answers
+- `data/evaluation_report.md` — shareable Markdown summary
+
+## Project structure
+
+```text
+main.py                Streamlit application
+rag/embeddings.py      OpenAI embedding functions
+rag/ingestion.py       File reading and document chunking
+rag/vector_store.py    Local Qdrant storage and search
+rag/retrieval.py       Question retrieval and context building
+rag/generation.py      OpenAI Agents SDK answer generation
+rag/evaluation.py      Ragas evaluation runner
+data/                  Evaluation data and results
+assets/                README screenshot and demo video
+```
